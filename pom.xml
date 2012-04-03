@@ -32,7 +32,7 @@
     <name>JBoss AS7 Custom Deployment Plugin</name>
 
     <properties>
-        <as.version>7.0.0.CR1</as.version>
+        <as.version>7.1.2.Final-SNAPSHOT</as.version>
     </properties>
 
     <dependencies>

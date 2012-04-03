@@ -22,11 +22,11 @@
 
 package org.jboss.as.plugin.deployment;
 
-import java.io.File;
-import java.io.IOException;
-
 import static org.jboss.as.plugin.deployment.CustomDeployment.Type;
 import static org.jboss.as.plugin.deployment.CustomDeployment.Type.DEPLOY;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Date: 11.07.2011
@@ -41,6 +41,7 @@ public class Main {
         int port = 9999;
         File archive = null;
         Type type = DEPLOY;
+        int iterations = 1;
 
         // At least one parameter must be passed
         if (args == null || args.length < 1) {
@@ -70,6 +71,8 @@ public class Main {
                     printUsage();
                     System.exit(1);
                 }
+            } else if ("-iterations".equalsIgnoreCase(arg)) {
+                iterations = Integer.parseInt(args[++i]);
             } else {
                 // arg should be a file and the file must exist
                 final File file = new File(arg);
@@ -85,21 +88,28 @@ public class Main {
 
         // Create the custom deployment
         final CustomDeployment deployment = new CustomDeployment(hostname, port, archive, type);
-        switch (deployment.execute()) {
-            case SUCCESS: {
-                System.out.printf("Deployment was successful for archive %s.%n", deployment.getArchive());
-                break;
-            }
-            case FAILURE: {
-                System.out.printf("Deployment failed for archive %s.%n", deployment.getArchive());
-                System.out.println("  Errors:");
-                for (Throwable t : deployment.getErrors()) {
-                    System.out.printf("   %s%n", t.getMessage());
+        for (int i = 0; i < iterations; i++) {
+            switch (deployment.execute()) {
+                case SUCCESS: {
+                    System.out.printf("Deployment was successful for archive %s.%n", deployment.getArchive());
+                    break;
                 }
-                System.exit(1);
+                case FAILURE: {
+                    System.out.printf("Deployment failed for archive %s.%n", deployment.getArchive());
+                    System.out.println("  Errors:");
+                    for (Throwable t : deployment.getErrors()) {
+                        System.out.printf("   %s%n", t.getMessage());
+                    }
+                    System.exit(1);
+                }
+                default: {
+                    System.out.println("Invalid response from the deployment.");
+                }
             }
-            default: {
-                System.out.println("Invalid response from the deployment.");
+            if (type == DEPLOY) {
+                deployment.setType(Type.REDEPLOY);
+            } else {
+                break;
             }
         }
         System.exit(0);

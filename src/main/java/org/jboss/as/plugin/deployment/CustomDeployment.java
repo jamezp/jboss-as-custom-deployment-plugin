@@ -73,7 +73,7 @@ final class CustomDeployment {
     private final String hostname;
     private final int port;
     private final File archive;
-    private final Type type;
+    private Type type;
 
     private final List<Throwable> errors = new LinkedList<Throwable>();
 
@@ -169,6 +169,10 @@ final class CustomDeployment {
 
     public Type getType() {
         return type;
+    }
+
+    void setType(final Type type) {
+        this.type = type;
     }
 
     @Override
