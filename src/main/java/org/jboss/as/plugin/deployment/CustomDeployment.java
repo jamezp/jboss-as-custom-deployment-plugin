@@ -22,6 +22,14 @@
 
 package org.jboss.as.plugin.deployment;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.controller.client.helpers.standalone.DeploymentAction;
 import org.jboss.as.controller.client.helpers.standalone.DeploymentPlan;
@@ -30,14 +38,6 @@ import org.jboss.as.controller.client.helpers.standalone.ServerDeploymentActionR
 import org.jboss.as.controller.client.helpers.standalone.ServerDeploymentManager;
 import org.jboss.as.controller.client.helpers.standalone.ServerDeploymentPlanResult;
 import org.jboss.as.controller.client.helpers.standalone.ServerUpdateActionResult;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Date: 11.07.2011
@@ -75,7 +75,7 @@ final class CustomDeployment {
     private final File archive;
     private Type type;
 
-    private final List<Throwable> errors = new LinkedList<Throwable>();
+    private final List<Throwable> errors = new ArrayList<Throwable>();
 
     CustomDeployment(final String hostname, final int port, final File archive, final Type type) {
         this.hostname = hostname;
@@ -125,7 +125,10 @@ final class CustomDeployment {
                         case FAILED:
                         case NOT_EXECUTED:
                         case ROLLED_BACK: {
-                            errors.add(actionResult.getDeploymentException());
+                            final Throwable t = actionResult.getDeploymentException();
+                            if (t != null) {
+                                errors.add(t);
+                            }
                             status = Status.FAILURE;
                             break;
                         }

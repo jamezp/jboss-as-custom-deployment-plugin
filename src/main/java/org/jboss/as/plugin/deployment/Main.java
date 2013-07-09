@@ -24,6 +24,7 @@ package org.jboss.as.plugin.deployment;
 
 import static org.jboss.as.plugin.deployment.CustomDeployment.Type;
 import static org.jboss.as.plugin.deployment.CustomDeployment.Type.DEPLOY;
+import static org.jboss.as.plugin.deployment.CustomDeployment.Type.REDEPLOY;
 
 import java.io.File;
 import java.io.IOException;
@@ -98,7 +99,7 @@ public class Main {
                     System.out.printf("Deployment failed for archive %s.%n", deployment.getArchive());
                     System.out.println("  Errors:");
                     for (Throwable t : deployment.getErrors()) {
-                        System.out.printf("   %s%n", t.getMessage());
+                        System.out.printf("   %s%n", t);
                     }
                     System.exit(1);
                 }
@@ -106,7 +107,7 @@ public class Main {
                     System.out.println("Invalid response from the deployment.");
                 }
             }
-            if (type == DEPLOY) {
+            if (type == DEPLOY || type == REDEPLOY) {
                 deployment.setType(Type.REDEPLOY);
             } else {
                 break;
